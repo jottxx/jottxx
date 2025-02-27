@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Navigation System</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="html.css">
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+        #searchBar {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="welcome">
+        <h1>WELCOME TO <abbr title="GHANA COMMUNICATION TECHNOLOGY UNIVERSITY">GCTU</abbr> CAMPUS<br>NAVIGATION SYSTEM<br>AND<br>RESOURCE LOCATOR</h1>
+    </div>
+
+    <div id="choice" style="display:none; background-image: url(PROJECT.img/DESIGN.jpg);">
+        <p>🔊🔊If you are a student or staff member, click Yes. Otherwise, click No🔊🔊.</p>
+        <button type="button" onclick="showStudentForm()">Yes</button>
+        <button type="button" onclick="showVisitorForm()">No</button>
+        <div class="dropdown">
+            <button type="button" class="dropdown-button" onclick="toggleDropdown()">Group Members</button>
+            <div class="dropdown-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Index Number</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Loretta Deh </td>
+                            <td> 1692782634</td>
+                        </tr>
+                        <tr>
+                            <td>Henry ofori Kwame </td>
+                            <td>1699733639</td>
+                        </tr>
+                        <tr>
+                            <td>Aboagye Prince Kwadwo </td>
+                            <td>1701984284</td>
+                        </tr>
+                        <tr>
+                            <td>Okyere Festus</td>
+                            <td> 1702039029</td>
+                        </tr>
+                        <tr>
+                            <td>Ayitey Joseph</td>
+                            <td> 1686335557</td>
+                        </tr>
+                        <tr>
+                            <td>Annan Francis Owusu  </td>
+                            <td>1696880166</td>
+                        </tr>
+                        <tr>
+                            <td>Agbenu Emmanuel</td>
+                            <td> 1706353842</td>
+                        </tr>
+                        <tr>
+                            <td>Abdul Samed Hamisu Jimoh </td>
+                            <td>1702406813</td>
+                        </tr>
+                        <tr>
+                            <td>Quayson Francis</td>
+                            <td>1699290561</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Form -->
+    <div id="studentForm" style="display:none;">
+        <form onsubmit="submitStudentForm(event)">
+           <p>📚📚 <b>STUDENT & STAFF MEMBERS FORM</b> 📚📚</p>
+           <p>🚨🚨 STUDENT & STAFF MEMBERS SHOULD USE THEIR FULLNAME, ID NUMBER AND PASSWORD 🚨🚨</p>
+            <input type="text" id="studentName" placeholder="FULL NAME" name="studentName" required>
+            <input type="number" id="indexNumber" placeholder="INDEX NUMBER" name="indexNumber" required>
+            <input type="password" id="password" placeholder="PASSWORD" name="password" required>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <!-- Visitor Form -->
+    <div id="visitorForm" style="display:none;">
+        <form onsubmit="submitVisitorForm(event)">
+            <p>🧍‍♂️🧍‍♂️<b> VISITORS FORM</b> 🧍‍♂️🧍‍♂️</p>
+            <p>🎊🎊 Please fill this form 🎊🎊</p>
+            <input type="text" id="visitorName" placeholder="FULL NAME" name="visitorName" required>
+            <input type="number" id="telephone" placeholder="TELEPHONE NUMBER" name="telephone" required>
+            <input type="text" id="email" placeholder="E-MAIL" name="email" required>
+            <input type="text" id="reason"  placeholder="REASON FOR VISIT" name="reason" required>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <!-- Campus Navigator Section -->
+    <div id="navigator" style="display:none;">
+        <h2>GHANA COMMUNICATION TECHNOLOGY UNIVERSITY ACCRA
+            <br>CAMPUS NAVIGATOR </h2>
+        <p>🎉🎉🎉🎉Welcome to the campus! Use the map and search for locations to find your way.🎉🎉🎉🎉</p>
+        <div id="searchBar">
+            <input type="text" id="searchInput" placeholder="Search for a destination..." >
+            <button type="button" onclick="searchDestination()">Search</button>
+            <button type="button" id="directionButton" style="display: none;" onclick="drawRoute()">Direction</button>
+        </div>
+        <button type="button" id="startTracking" onclick="startTracking()">Start Tracking</button>
+        <div id="map"></div>
+        <nav>
+            <label for="destinationSelect">Choose a destination:</label>
+            <select id="destinationSelect" onchange="updateSearchBar()">
+                <option value="" selected disabled>Select a destination</option>
+                <option value="GCTU Car Park1">GCTU Car Park1</option>
+                <option value="GCTU Gate">GCTU Gate</option>
+                <option value="GCTU Block B Shed">GCTU Block B Shed</option>
+                <option value="GCTU Block B">GCTU Block B</option>
+                <option value="GCTU Main Car Park">GCTU Main Car Park</option>
+                <option value="GCTU Staff Car Park">GCTU Staff Car Park</option>
+                <option value="GCTU Main Ent.">GCTU Main Ent.</option>
+                <option value="GCTU Florence Aud.">GCTU Florence Aud.</option>
+                <option value="Our Day">Our Day</option>
+                <option value="GCTU G Block">GCTU G Block</option>
+                <option value="Our Day Place">Our Day Place</option>
+                <option value="GCTU G Block 4Floor">GCTU G Block 4Floor</option>
+                <option value="GCTU G Block 3Floor">GCTU G Block 3Floor</option>
+                <option value="GCTU G Block 2Floor">GCTU G Block 2Floor</option>
+                <option value="GCTU G Block 1Floor">GCTU G Block 1Floor</option>
+                <option value="GCTU Faculty of Engineering">GCTU Faculty of Engineering</option>
+                <option value="GCTU Hostel B C">GCTU Hostel B C</option>
+                <option value="GCTU Hostel B B">GCTU Hostel B B</option>
+                <option value="GCTU Hostel B A">GCTU Hostel B A</option>
+                <option value="GCTU Hostel B GACC">GCTU Hostel B GACC</option>
+                <option value="GCTU Gate2">GCTU Gate2</option>
+                <option value="GCTU Printing Press">GCTU Printing Press</option>
+                <option value="GCTU Sports Complex">GCTU Sports Complex</option>
+                <option value="GCTU Cafeteria">GCTU Cafeteria</option>
+                <option value="GCTU Software System Unit">GCTU Software System Unit</option>
+                <option value="GCTU COLT">GCTU COLT</option>
+                <option value="GCTU Takoradi Campus">GCTU Takoradi Campus</option>
+                <option value="GCTU Business Campus Abeka">GCTU Business Campus Abeka </option>
+                <option value="GCTU Tesano Campus">GCTU Tesano Campus</option>
+                <option value="GCTU Kumasi Campus">GCTU Kumasi Campus</option>
+                <option value="GCTU Block C">GCTU Block C</option>
+                <option value=" Department of Information Technologyt">Department of Information Technology </option>
+                <option value="Language Center">Language Center</option>
+                <option value="Computer Lab">Computer Lab</option>
+                <option value="Bush Canten">Bush Canten</option>
+                <option value="Eva Aud">Eva Aud</option>
+                <option value="Main Libary">Main Libary</option>
+                <option value="Directorate of Information Techology">Directorate of Information Techology</option>
+                <option value="Directrate of Human Resource and Organisational Development">Directrate of Human Resource and Organisational Development</option>
+                <option value="Internal Audit Directorate Annex">Internal Audit Directorate Annex</option>
+                <option value="Finance Directorate / Head,Finance Accounting and Reporting">Finance Directorate / Head,Finance Accounting and Reporting</option>
+                <option value="Directorate of Finance/Accounts Payable">Directorate of Finance/Accounts Payable</option>
+                <option value="Exective Wing">Exective Wing</option>
+                <option value="Adimisson Office">Adimisson Office</option>
+                <option value="Faculty of Computing and Information System">Faculty of Computing and Information System</option>
+                <option value="GCTU Infirmary and Lab">GCTU Infirmary and Lab</option>
+                <!-- Add more destinations as needed -->
+            </select>
+        </nav>
+    </div>
+
+   <!-- Add Navigation Menu -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    <script>
+        const welcomeDiv = document.getElementById('welcome');
+        const choiceDiv = document.getElementById('choice');
+        const studentFormDiv = document.getElementById('studentForm');
+        const visitorFormDiv = document.getElementById('visitorForm');
+        const navigatorDiv = document.getElementById('navigator');
+        const searchInput = document.getElementById('searchInput');
+        const startTrackingBtn = document.getElementById('startTracking');
+        let map;
+        let routingControl; // Holds the route control instance
+        let currentLocationMarker;
+        let watchID;
+        let liveTracking = false; // To toggle tracking on and off
+        let userLat, userLng;
+
+        // Display welcome message for 10 seconds
+        welcomeDiv.style.display = 'block';
+        setTimeout(() => {
+            welcomeDiv.style.display = 'none';
+            choiceDiv.style.display = 'block';
+        }, 6000);
+
+        function showStudentForm() {
+            choiceDiv.style.display = 'none';
+            studentFormDiv.style.display = 'block';
+        }
+
+        function showVisitorForm() {
+            choiceDiv.style.display = 'none';
+            visitorFormDiv.style.display = 'block';
+        }
+
+        function submitStudentForm(event) {
+            event.preventDefault();
+            studentFormDiv.style.display = 'none';
+            navigatorDiv.style.display = 'block';
+            initializeMap();
+        }
+
+        function submitVisitorForm(event) {
+            event.preventDefault();
+            visitorFormDiv.style.display = 'none';
+            navigatorDiv.style.display = 'block';
+            initializeMap();
+        }
+
+        function initializeMap() {
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by your browser.");
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    userLat = position.coords.latitude;
+                    userLng = position.coords.longitude;
+
+                    map = L.map('map').setView([userLat, userLng], 15);
+
+                    // Add OpenStreetMap tiles
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                    }).addTo(map);
+
+                    // Add marker for user's current location
+                    currentLocationMarker = L.marker([userLat, userLng]).addTo(map)
+                        .bindPopup('You are here!')
+                        .openPopup();
+                },
+                (error) => {
+                    alert("Unable to retrieve your location: " + error.message);
+                }
+            );
+        }
+        //dropdown
+        function toggleDropdown() {
+            const dropdownContent = document.querySelector('.dropdown-content');
+            dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Optional: Close the dropdown if clicked outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropdown-button')) {
+                const dropdownContent = document.querySelector('.dropdown-content');
+                if (dropdownContent.style.display === 'block') {
+                    dropdownContent.style.display = 'none';
+                }
+            }
+        };
+
+
+
+        function updateSearchBar() {
+            const selectElement = document.getElementById('destinationSelect');
+            const selectedDestination = selectElement.value;
+
+            if (selectedDestination) {
+                searchInput.value = selectedDestination; // Set the selected destination in the search bar
+            }
+        }
+
+        function searchDestination() {
+    const query = searchInput.value.trim().toLowerCase();
+    const destinations = {
+                'gctu car park1': [5.5966515, -0.223659],
+                'gctu gate': [5.5971528, -0.2237032],
+                'gctu block b shed': [5.595689, -0.223229],
+                'gctu block b': [5.595234, -0.222901],
+                'gctu main car park': [5.595890, -0.222823],
+                'gctu staff car park': [5.595050, -0.222387],
+                'gctu main ent.': [5.595387, -0.223256],
+                'gctu florence aud.': [5.595781, -0.222501],
+                'our day': [5.594943, -0.221677],
+                'gctu g block': [5.594722, -0.222401],
+                'our day place': [5.5955039, -0.2236492],
+                'gctu g block 4floor': [5.5959829, -0.2225319],
+                'gctu g block 3floor': [5.5958768, -0.2227144],
+                'gctu g block 2floor': [5.5958939, -0.2227175],
+                'gctu g block 1floor': [5.595944, -0.222715],
+                'gctu faculty of engineering': [5.5961292, -0.2230503],
+                'gctu hostel b c': [5.5958277, -0.2228704],
+                'gctu hostel b b': [5.5955099, -0.2233215],
+                'gctu hostel b a': [5.5956971, -0.2237152],
+                'gctu hostel b gacc': [5.5958826, -0.2228098],
+                'gctu gate2': [5.5956153, -0.2226724],
+                'gctu printing press': [5.596092, -0.2226604],
+                'gctu sports complex': [5.5961035, -0.2239322],
+                'gctu cafeteria': [5.5959322, -0.2236766],
+                'gctu software system unit': [5.5962584, -0.2230851],
+                'gctu colt': [5.5964264, -0.2235074],
+                'gctu takoradi campus':[4.903065, -1.757222],
+                'gctu business campus abeka':[5.599540, -0.236335],
+                'gctu tesano campus':[5.599539, -0.236242],
+                'gctu kumasi campus':[6.663243, -1.618164],
+                'gctu forecult':[5.5959643, -0.2239172],
+                'gctu block c':[5.5958544, -0.2239002],
+                'department of information technology':[5.5958279, -0.2238663],
+                'language center':[5.5958611, -0.2239127],
+                'computer lab':[5.595887, -0.223921],
+                'bush canten':[5.595863, -0.223893],
+                'eva aud':[5.5966374, -0.2234331],
+                'main libary':[5.5966764, -0.223572],
+                'directorate of information techology':[5.596671, -0.2232815],
+                'directrate of human reasource and organisational development':[5.5967023, -0.223459],
+                'internal audit directorate annex':[5.5967023, -0.2232245],
+                'finance directorate / head,finance accounting and reporting ':[5.5967309, -0.2232789],
+                'directorate of finance/accounts payable':[5.5968393, -0.2233102],
+                'exective wing':[5.5968323, -0.223357],
+                'adimisson office':[5.5967915, -0.223333],
+                'faculty of computing and information system':[5.5958787, -0.2239353],
+                'gctu infirmary and lab':[5.5960688, -0.2239018],
+    };          
+
+    // Search for the destination
+    const destinationKey = Object.keys(destinations).find((key) =>
+        key.includes(query)
+    );
+
+    if (destinationKey) {
+        const [destLat, destLng] = destinations[destinationKey];
+
+        // Remove previous route if it exists
+        if (routingControl) {
+            routingControl.remove();
+        }
+
+        // Create a route from the user's location to the destination
+        routingControl = L.Routing.control({
+            waypoints: [
+                L.latLng(userLat, userLng), // User's current location
+                L.latLng(destLat, destLng), // Destination location
+            ],
+            routeWhileDragging: true,
+            lineOptions: { styles: [{ color: 'red', weight: 5 }] }, // Red route
+            show: false, // Hides default instructions
+        }).addTo(map);
+
+        // Zoom to show the entire route
+        map.fitBounds([
+            [userLat, userLng],
+            [destLat, destLng],
+        ]);
+    } else {
+        alert('Destination not found');
+    }
+}
+
+
+        function startTracking() {
+            liveTracking = !liveTracking;
+            if (liveTracking) {
+                startTrackingBtn.textContent = 'Stop Tracking';
+                watchID = navigator.geolocation.watchPosition((position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    if (currentLocationMarker) {
+                        currentLocationMarker.setLatLng([lat, lng]);
+                    } else {
+                        currentLocationMarker = L.marker([lat, lng]).addTo(map);
+                    }
+
+                    if (routingControl) {
+                        routingControl.setWaypoints([
+                            L.latLng(lat, lng),
+                            routingControl.getWaypoints()[1],
+                        ]);
+                    }
+                });
+            } else {
+                startTrackingBtn.textContent = 'Start Tracking';
+                navigator.geolocation.clearWatch(watchID);
+            }
+        }
+    </script>
+</body>
+</html>
